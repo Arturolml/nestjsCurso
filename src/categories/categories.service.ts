@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository} from '@nestjs/typeorm'
-import { Repository} from 'typeorm'
+import { HttpException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
@@ -8,9 +8,9 @@ import { Category } from './entities/category.entity';
 @Injectable()
 export class CategoriesService {
   constructor(
-    @InjectRepository(Category)private readonly categoryRepository: Repository<Category>
+    @InjectRepository(Category) private readonly categoryRepository: Repository<Category>
 
-  ){}
+  ) { }
 
 
   create(createCategoryDto: CreateCategoryDto) {
@@ -23,8 +23,11 @@ export class CategoriesService {
     return this.categoryRepository.find()
   }
 
-  findOne(id: number) {
-    const category =  this.categoryRepository.findOneBy({id})
+  async findOne(id: number) {
+    const category = await this.categoryRepository.findOneBy({ id })
+    if (!category) {
+      throw new HttpException('la Categoria no existe', 404)
+    }
     return category
   }
 
